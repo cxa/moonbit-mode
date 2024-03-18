@@ -91,6 +91,7 @@ e.g. `Int' in `type UserId Int'."
       (lowercase_identifier) @font-lock-variable-name-face
       (qualified_identifier
        (lowercase_identifier) @font-lock-variable-use-face)
+      (package_identifier) @font-lock-constant-face
       ;; top level `let' consider as constant
       (value_definition
        (lowercase_identifier) @font-lock-constant-face)
