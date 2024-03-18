@@ -157,6 +157,7 @@ Return nil if there is no name or if NODE is not a defun node."
                 ("Struct" "\\`struct_definition\\'" nil nil)
                 ("Newtype" "\\`type_definition\\'" nil nil)))
   (treesit-major-mode-setup))
+
 (define-derived-mode moonbit-mode prog-mode "MoonBit"
   "Major mode for editing MoonBit."
   (when (treesit-ready-p 'moonbit)
