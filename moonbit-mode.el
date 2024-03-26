@@ -57,13 +57,17 @@ e.g. `Int' in `type UserId Int'."
      ((boolean_literal) @font-lock-constant-face
       [(float_literal) (integer_literal)] @font-lock-number-face
       ;; TODO: only highlight char inside ''
-      (char_literal) @font-lock-string-face)
+      (char_literal) @font-lock-string-face
+      (byte_literal
+       ["b'" "'"] @font-lock-comment-face)
+      (byte_literal
+       ;; TODO: wait for moonbit-treesit to support non escape sequence
+       (escape_sequence) @font-lock-string-face))
 
      :language moonbit
      :feature string
      ((string_fragment) @font-lock-string-face
-      ;; TODO
-      (multiline_string_separator) @font-lock-comment-face
+      ;; TODO: multiline_string_separator
       (multiline_string_fragment) @font-lock-string-face
       (interpolator
        "\\(" @font-lock-misc-punctuation-face
