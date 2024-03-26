@@ -130,7 +130,8 @@ e.g. `Int' in `type UserId Int'."
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ((parent-is ,(rx (one-or-more letter) (or "_definition" "_expression")))
-      parent-bol tab-width))))
+      parent-bol tab-width)
+     ((parent-is "multiline_string_literal") parent-bol 0))))
 
 (defun moonbit--treesit-defun-name (node)
   "Return the defun name of NODE.
