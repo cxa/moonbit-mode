@@ -40,17 +40,18 @@ e.g. `Int' in `type UserId Int'."
 (defvar moonbit--keywords
   '("if" "while" "break" "continue" "return" "match" "else" "as" "loop" "test"
     "fn" "type" "let" "mut" "enum" "struct"  "trait" "pub" "priv"
-    "readonly")
+    "readonly" "async" "const" "extern" "derive" "raise" "impl" "and")
   "MoonBit keywords.")
 
 (defvar moonbit--operators
-  '((pipe_operator) "*" "/" "%" "+" "-" ">" ">=" "<=" "<" "==" "!=" "=" "+=" "-=" "*=" "/=")
+  '("|>" "*" "/" "%" "+" "-" ">>" "<<" ">" ">=" "<=" "<" "==" "!=" "=" "+=" "-=" "*=" "/=" "%=" "!" "!!" "?")
   "MoonBit operators.")
 
 (defvar moonbit--font-lock-rules
   `( :language moonbit
      :feature comment
-     ([(comment) (docstring)] @font-lock-comment-face)
+     ;; tree-sitter-moonbit defines only `comment`
+     ((comment) @font-lock-comment-face)
 
      :language moonbit
      :feature literal
@@ -67,11 +68,11 @@ e.g. `Int' in `type UserId Int'."
      :language moonbit
      :feature string
      ((string_fragment) @font-lock-string-face
-      ;; TODO: multiline_string_separator
       (multiline_string_fragment) @font-lock-string-face
+      ;; tree-sitter-moonbit interpolator uses \{ ... }
       (interpolator
-       "\\(" @font-lock-misc-punctuation-face
-       ")" @font-lock-misc-punctuation-face))
+       "\\{" @font-lock-misc-punctuation-face
+       "}"  @font-lock-misc-punctuation-face))
 
      :language moonbit
      :feature keyword
@@ -83,7 +84,8 @@ e.g. `Int' in `type UserId Int'."
 
      :language moonbit
      :feature delimiter
-     ([(dot_operator) (colon) (colon_colon) ","] @font-lock-delimiter-face)
+     ;; grammar uses raw punctuation tokens, not named nodes
+     (["." ":" "::" ","] @font-lock-delimiter-face)
 
      :language moonbit
      :feature operator
@@ -96,32 +98,40 @@ e.g. `Int' in `type UserId Int'."
       (qualified_identifier
        (lowercase_identifier) @font-lock-variable-use-face)
       (package_identifier) @font-lock-constant-face
-      (labeled_identifier) @font-lock-variable-name-face
       ;; top level `let' consider as constant
       (value_definition
        (lowercase_identifier) @font-lock-constant-face)
       (apply_expression
-       (simple_expression
-        (qualified_identifier
-         (lowercase_identifier) @font-lock-function-call-face)))
-      ;; for pipe function without args
+       (qualified_identifier
+        (lowercase_identifier) @font-lock-function-call-face))
+      ;; for pipe function without args: `... |> foo`
       (binary_expression
-       (pipe_operator)
-       (expression
-        (simple_expression
-         (qualified_identifier
-          (lowercase_identifier) @font-lock-function-call-face))))
+       _ "|>"
+       (qualified_identifier
+        (lowercase_identifier) @font-lock-function-call-face))
       
       ;; uppercase
       (uppercase_identifier) @font-lock-type-face
+
+      ;; @pkg.TypeName in type positions
+      (qualified_type_identifier
+       (dot_identifier
+        (dot_uppercase_identifier) @font-lock-type-face))
+
       ;; make constructor alternative
       (enum_constructor (uppercase_identifier) @moonbit-alt-type-face)
       (constructor_expression (uppercase_identifier) @moonbit-alt-type-face)
-      ;; for `B' in `type A B'
+      ;; @pkg.TypeName as a constructor
+      (constructor_expression
+       (dot_uppercase_identifier) @moonbit-alt-type-face)
+      ;; Only mark the RHS "second type" in `type A B` declarations as alt.
+      ;; Do NOT globally style all apply_type, or it will override field types.
       (type_definition
-       (type 
-        (apply_type
-         (qualified_type_identifier) @moonbit-alt-type-face))))))
+       (qualified_type_identifier) @moonbit-alt-type-face)
+      (type_definition
+       (apply_type
+        (qualified_type_identifier) @moonbit-alt-type-face)))))
+
 
 (defvar moonbit--treesit-indent-rules
   `((moonbit
