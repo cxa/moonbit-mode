@@ -1,0 +1,22 @@
+package "example/geometry"
+
+import {
+  "moonbitlang/core/array"
+}
+
+pub struct Point {
+  x : Int32
+  y : UInt32
+}
+
+pub struct UserId(Int32)
+
+pub trait Printable {
+  print(Self) -> String
+}
+
+declare pub async fn[T] Point::convert(Self, T) -> Int32
+
+impl Printable for Point
+
+pub let default_limit : Int32

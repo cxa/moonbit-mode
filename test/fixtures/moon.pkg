@@ -1,0 +1,19 @@
+import {
+  "moonbitlang/core/array",
+  "moonbitlang/core/json" @json,
+} for "test"
+
+warnings = "+deprecated-unused_value"
+
+options(
+  "allow-experimental-packages": true,
+  supported_targets: [
+    "native",
+    "wasm-gc",
+  ],
+  formatter: {
+    "ignore": [
+      "generated.mbt",
+    ],
+  },
+)
